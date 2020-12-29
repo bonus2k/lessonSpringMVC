@@ -20,6 +20,11 @@ public class PersonDAO {
         personList.add(new Person(COUNT++, "Lena"));
     }
 
+    public void save(Person person) {
+        person.setId(COUNT++);
+        personList.add(person);
+    }
+
     public List<Person> index(){
         return personList;
     }
