@@ -5,6 +5,7 @@ import ru.snkatvit.springcourse.models.Person;
 
 import java.util.ArrayList;
 import java.util.List;
+
 @Component
 public class PersonDAO {
     private static int COUNT = 0;
@@ -25,14 +26,23 @@ public class PersonDAO {
         personList.add(person);
     }
 
-    public List<Person> index(){
+    public List<Person> index() {
         return personList;
     }
 
-    public Person show(int id){
+    public Person show(int id) {
         return personList.stream()
-                .filter(person->person.getId()==id)
+                .filter(person -> person.getId() == id)
                 .findAny()
                 .orElse(null);
+    }
+
+    public void update(int id, Person personUpdate) {
+        personList.removeIf(person -> person.getId() == id);
+        personList.add(personUpdate);
+    }
+
+    public void delete(int id) {
+        personList.removeIf(person -> person.getId() == id);
     }
 }
