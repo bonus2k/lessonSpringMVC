@@ -3,46 +3,71 @@ package ru.snkatvit.springcourse.dao;
 import org.springframework.stereotype.Component;
 import ru.snkatvit.springcourse.models.Person;
 
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class PersonDAO {
     private static int COUNT = 0;
-    List<Person> personList;
+    private static final String URL = "jdbc:mysql://localhost:3306/first_db";
+    private static final String USERNAME = "root";
+    private static final String PASSWORD = "root";
 
-    {
-        personList = new ArrayList<>();
-        personList.add(new Person(COUNT++, "Jon", 18, "jon@mail.com"));
-        personList.add(new Person(COUNT++, "Vasy", 40, "vasya@mail.com"));
-        personList.add(new Person(COUNT++, "Mish", 30, "misha@mail.com"));
-        personList.add(new Person(COUNT++, "Jack", 23, "jack@mail.com"));
-        personList.add(new Person(COUNT++, "Bob", 34, "bob@mail.com"));
-        personList.add(new Person(COUNT++, "Lena", 41, "lena@mail.com"));
+    static {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
     }
+    private static Connection connection;
 
     public void save(Person person) {
-        person.setId(COUNT++);
-        personList.add(person);
+        try {
+            Statement statement = connection.createStatement();
+            String SQL = String.format("INSERT INTO Person VALUES(%d, '%s', %d, '%s');",
+                    person.getId(), person.getName(), person.getAge(), person.getEmail());
+            statement.executeUpdate(SQL);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
     public List<Person> index() {
-        return personList;
+        List<Person> people = new ArrayList<>();
+        try {
+            Statement statement = connection.createStatement();
+            String SQL = "SELECT * FROM Person;";
+            ResultSet resultSet = statement.executeQuery(SQL);
+            while (resultSet.next()){
+                Person person = new Person();
+                person.setId(resultSet.getInt("id"));
+                person.setAge(resultSet.getInt("age"));
+                person.setName(resultSet.getString("name"));
+                person.setEmail(resultSet.getString("email"));
+                people.add(person);
+                System.out.println(person.getName() + person.getId());
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return people;
     }
 
     public Person show(int id) {
-        return personList.stream()
-                .filter(person -> person.getId() == id)
-                .findAny()
-                .orElse(null);
+        return null;
     }
 
     public void update(int id, Person personUpdate) {
-        personList.removeIf(person -> person.getId() == id);
-        personList.add(personUpdate);
+//        personList.removeIf(person -> person.getId() == id);
+//        personList.add(personUpdate);
     }
 
     public void delete(int id) {
-        personList.removeIf(person -> person.getId() == id);
+//        personList.removeIf(person -> person.getId() == id);
     }
 }
