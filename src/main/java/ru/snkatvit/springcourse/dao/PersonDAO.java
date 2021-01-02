@@ -1,6 +1,7 @@
 package ru.snkatvit.springcourse.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.snkatvit.springcourse.models.Person;
@@ -29,7 +30,8 @@ public class PersonDAO {
     }
 
     public Person show(int id) {
-        return jdbcTemplate.query("SELECT * FROM Person WHERE id=?", new Object[]{id}, new PersonMaper())
+        return jdbcTemplate.query("SELECT * FROM Person WHERE id=?", new Object[]{id},
+                new BeanPropertyRowMapper<>(Person.class))
                 .stream().findAny().orElse(null);
     }
 
